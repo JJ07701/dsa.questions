@@ -1,0 +1,202 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+struct Node* head = NULL;
+
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+void insertBeginning(int data) {
+    struct Node* newNode = createNode(data);
+    newNode->next = head;
+    head = newNode;
+}
+
+void insertEnd(int data) {
+    struct Node* newNode = createNode(data);
+    if (head == NULL) {
+        head = newNode;
+        return;
+    }
+    struct Node* temp = head;
+    while (temp->next != NULL)
+        temp = temp->next;
+    temp->next = newNode;
+}
+
+void insertPosition(int data, int pos) {
+    struct Node* newNode = createNode(data);
+    if (pos == 1) {
+        newNode->next = head;
+        head = newNode;
+        return;
+    }
+    struct Node* temp = head;
+    int i = 1;
+    while (temp != NULL && i < pos - 1) {
+        temp = temp->next;
+        i++;
+    }
+    if (temp == NULL) return;
+    newNode->next = temp->next;
+    temp->next = newNode;
+}
+
+void deleteBeginning() {
+    if (head == NULL) return;
+    struct Node* temp = head;
+    head = head->next;
+    free(temp);
+}
+
+void deleteEnd() {
+    if (head == NULL) return;
+    if (head->next == NULL) {
+        free(head);
+        head = NULL;
+        return;
+    }
+    struct Node* temp = head;
+    while (temp->next->next != NULL)
+        temp = temp->next;
+    free(temp->next);
+    temp->next = NULL;
+}
+
+void deletePosition(int pos) {
+    if (head == NULL) return;
+    if (pos == 1) {
+        deleteBeginning();
+        return;
+    }
+    struct Node* temp = head;
+    int i = 1;
+    while (temp->next != NULL && i < pos - 1) {
+        temp = temp->next;
+        i++;
+    }
+    if (temp->next == NULL) return;
+    struct Node* del = temp->next;
+    temp->next = del->next;
+    free(del);
+}
+
+void search(int key) {
+    struct Node* temp = head;
+    int pos = 1;
+    while (temp != NULL) {
+        if (temp->data == key) {
+            printf("Found at position %d\n", pos);
+            return;
+        }
+        temp = temp->next;
+        pos++;
+    }
+    printf("Not Found\n");
+}
+
+void reverse() {
+    struct Node *prev = NULL, *curr = head, *next;
+    while (curr != NULL) {
+        next = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr = next;
+    }
+    head = prev;
+}
+
+struct Node* merge(struct Node* h1, struct Node* h2) {
+    if (h1 == NULL) return h2;
+    if (h2 == NULL) return h1;
+
+    struct Node* temp = h1;
+    while (temp->next != NULL)
+        temp = temp->next;
+    temp->next = h2;
+    return h1;
+}
+
+void display() {
+    struct Node* temp = head;
+    while (temp != NULL) {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+
+void detectLoop() {
+    struct Node *slow = head, *fast = head;
+    while (slow && fast && fast->next) {
+        slow = slow->next;
+        fast = fast->next->next;
+        if (slow == fast) {
+            printf("Loop Detected\n");
+            return;
+        }
+    }
+    printf("No Loop\n");
+}
+
+int main() {
+    int choice, data, pos;
+    struct Node* head2 = NULL;
+
+    while (1) {
+        printf("\n1.Insert Beginning\n2.Insert End\n3.Insert Position\n4.Delete Beginning\n5.Delete End\n6.Delete Position\n7.Search\n8.Reverse\n9.Merge\n10.Display\n11.Detect Loop\n12.Exit\n");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                scanf("%d", &data);
+                insertBeginning(data);
+                break;
+            case 2:
+                scanf("%d", &data);
+                insertEnd(data);
+                break;
+            case 3:
+                scanf("%d %d", &data, &pos);
+                insertPosition(data, pos);
+                break;
+            case 4:
+                deleteBeginning();
+                break;
+            case 5:
+                deleteEnd();
+                break;
+            case 6:
+                scanf("%d", &pos);
+                deletePosition(pos);
+                break;
+            case 7:
+                scanf("%d", &data);
+                search(data);
+                break;
+            case 8:
+                reverse();
+                break;
+            case 9:
+                head = merge(head, head2);
+                break;
+            case 10:
+                display();
+                break;
+            case 11:
+                detectLoop();
+                break;
+            case 12:
+                exit(0);
+        }
+    }
+}
