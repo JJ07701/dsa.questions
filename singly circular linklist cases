@@ -1,0 +1,230 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+struct Node* head = NULL;
+
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = newNode;
+    return newNode;
+}
+
+void insertBeginning(int data) {
+    struct Node* newNode = createNode(data);
+
+    if (head == NULL) {
+        head = newNode;
+        return;
+    }
+
+    struct Node* temp = head;
+    while (temp->next != head)
+        temp = temp->next;
+
+    newNode->next = head;
+    temp->next = newNode;
+    head = newNode;
+}
+
+void insertEnd(int data) {
+    struct Node* newNode = createNode(data);
+
+    if (head == NULL) {
+        head = newNode;
+        return;
+    }
+
+    struct Node* temp = head;
+    while (temp->next != head)
+        temp = temp->next;
+
+    temp->next = newNode;
+    newNode->next = head;
+}
+
+void insertPosition(int data, int pos) {
+    struct Node* newNode = createNode(data);
+
+    if (head == NULL || pos == 1) {
+        insertBeginning(data);
+        return;
+    }
+
+    struct Node* temp = head;
+    int i = 1;
+
+    while (temp->next != head && i < pos - 1) {
+        temp = temp->next;
+        i++;
+    }
+
+    newNode->next = temp->next;
+    temp->next = newNode;
+}
+
+void deleteBeginning() {
+    if (head == NULL) return;
+
+    if (head->next == head) {
+        free(head);
+        head = NULL;
+        return;
+    }
+
+    struct Node* temp = head;
+    struct Node* last = head;
+
+    while (last->next != head)
+        last = last->next;
+
+    head = head->next;
+    last->next = head;
+    free(temp);
+}
+
+void deleteEnd() {
+    if (head == NULL) return;
+
+    if (head->next == head) {
+        free(head);
+        head = NULL;
+        return;
+    }
+
+    struct Node* temp = head;
+
+    while (temp->next->next != head)
+        temp = temp->next;
+
+    free(temp->next);
+    temp->next = head;
+}
+
+void deletePosition(int pos) {
+    if (head == NULL) return;
+
+    if (pos == 1) {
+        deleteBeginning();
+        return;
+    }
+
+    struct Node* temp = head;
+    int i = 1;
+
+    while (temp->next != head && i < pos - 1) {
+        temp = temp->next;
+        i++;
+    }
+
+    struct Node* del = temp->next;
+    if (del == head) return;
+
+    temp->next = del->next;
+    free(del);
+}
+
+void search(int key) {
+    if (head == NULL) {
+        printf("Not Found\n");
+        return;
+    }
+
+    struct Node* temp = head;
+    int pos = 1;
+
+    do {
+        if (temp->data == key) {
+            printf("Found at position %d\n", pos);
+            return;
+        }
+        temp = temp->next;
+        pos++;
+    } while (temp != head);
+
+    printf("Not Found\n");
+}
+
+void reverse() {
+    if (head == NULL || head->next == head) return;
+
+    struct Node *prev = NULL, *curr = head, *next;
+    struct Node* last = head;
+
+    while (last->next != head)
+        last = last->next;
+
+    do {
+        next = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr = next;
+    } while (curr != head);
+
+    head->next = prev;
+    head = prev;
+}
+
+void display() {
+    if (head == NULL) return;
+
+    struct Node* temp = head;
+
+    do {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    } while (temp != head);
+
+    printf("(head)\n");
+}
+
+int main() {
+    int choice, data, pos;
+
+    while (1) {
+        printf("\n1.Insert Beginning\n2.Insert End\n3.Insert Position\n4.Delete Beginning\n5.Delete End\n6.Delete Position\n7.Search\n8.Reverse\n9.Display\n10.Exit\n");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                scanf("%d", &data);
+                insertBeginning(data);
+                break;
+            case 2:
+                scanf("%d", &data);
+                insertEnd(data);
+                break;
+            case 3:
+                scanf("%d %d", &data, &pos);
+                insertPosition(data, pos);
+                break;
+            case 4:
+                deleteBeginning();
+                break;
+            case 5:
+                deleteEnd();
+                break;
+            case 6:
+                scanf("%d", &pos);
+                deletePosition(pos);
+                break;
+            case 7:
+                scanf("%d", &data);
+                search(data);
+                break;
+            case 8:
+                reverse();
+                break;
+            case 9:
+                display();
+                break;
+            case 10:
+                exit(0);
+        }
+    }
+}
