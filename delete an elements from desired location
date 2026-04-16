@@ -1,0 +1,71 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+struct Node* deleteAtPosition(struct Node* head, int position) {
+    if (head == NULL) {
+        printf("List is empty\n");
+        return head;
+    }
+
+    if (position == 1) {
+        struct Node* temp = head;
+        head = head->next;
+        free(temp);
+        return head;
+    }
+
+    struct Node* current = head;
+    int count = 1;
+
+    while (current->next != NULL && count < position - 1) {
+        current = current->next;
+        count++;
+    }
+
+    if (current->next == NULL) {
+        printf("Position out of range\n");
+        return head;
+    }
+
+    struct Node* temp = current->next;
+    current->next = temp->next;
+    free(temp);
+
+    return head;
+}
+
+void display(struct Node* head) {
+    struct Node* temp = head;
+    while (temp != NULL) {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+
+int main() {
+    struct Node* head = NULL;
+
+    head = (struct Node*)malloc(sizeof(struct Node));
+    head->data = 10;
+    head->next = (struct Node*)malloc(sizeof(struct Node));
+    head->next->data = 20;
+    head->next->next = (struct Node*)malloc(sizeof(struct Node));
+    head->next->next->data = 30;
+    head->next->next->next = NULL;
+
+    printf("Original List:\n");
+    display(head);
+
+    head = deleteAtPosition(head, 2);
+
+    printf("After Deletion:\n");
+    display(head);
+
+    return 0;
+}
